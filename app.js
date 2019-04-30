@@ -18,7 +18,8 @@ const authRequired = () => {
   return (req, res, next) => {
     // require request to have an authorization header
     if (!req.headers.authorization) {
-      return next(new Error('Authorization header is required'))
+      res.status(403);
+      return res.send('Authorization header is required');
     }
     let parts = req.headers.authorization.trim().split(' ')
     let accessToken = parts.pop()
@@ -30,7 +31,10 @@ const authRequired = () => {
         }
         next()
       })
-      .catch(next) // jwt did not verify!
+      .catch(err => {
+        res.status(403);
+        return res.send(`Not authorized: ${err}`);
+      }) // jwt did not verify!
   }
 }
 
